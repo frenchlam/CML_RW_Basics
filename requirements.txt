@@ -1,5 +1,6 @@
 ipython==7.10.0
 pandas==0.24.2
+chart_studio==1.0.0
 thrift_sasl
 pyhive
 sqlalchemy

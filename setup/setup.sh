@@ -9,12 +9,6 @@ wget http://stat-computing.org/dataexpo/2009/airports.csv -O /home/cdsw/airlines
 mkdir -p /home/cdsw/airlines/carriers/
 wget http://stat-computing.org/dataexpo/2009/carriers.csv -O /home/cdsw/airlines/carriers/carriers.csv
 
-hdfs dfs -mkdir -p airlines/
-hdfs dfs -copyFromLocal -f /home/cdsw/airlines/
-
-hdfs dfs -ls airlines/flights
-hdfs dfs -ls airlines/airports
-hdfs dfs -ls airlines/carriers
 
 python3 /home/cdsw/setup/create_tables.py
 

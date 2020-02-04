@@ -3,6 +3,7 @@ flights_path='airlines/flights/'
 airport_path='airlines/airports/' 
 carrier_path='airlines/carriers/'
 s3_prefix='s3a://ml-field/demo/flight-analysis/data/'
+file_prefix='file:////home/cdsw/'
 
 #### Start Spark Session ####
 
@@ -16,11 +17,8 @@ spark = SparkSession\
   .config("spark.executor.memory","2g")\
   .config("spark.executor.cores","2")\
   .config("spark.executor.instances","3")\
-  .config("spark.hadoop.fs.s3a.metadatastore.impl","org.apache.hadoop.fs.s3a.s3guard.NullMetadataStore")\
-  .config("spark.yarn.access.hadoopFileSystems", "s3a://ml-field/demo/flight-analysis/data/")\
+  .config("spark.yarn.access.hadoopFileSystems","s3a://prod-cdptrialuser19-trycdp-com/cdp-lake/")\
   .getOrCreate()
-
-#  .config("spark.hadoop.fs.s3a.aws.credentials.provider","org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider")\
 
         
 
@@ -40,7 +38,7 @@ except:
 print("save flights data")
 
 flights_df = spark.read.csv(
-    path=s3_prefix+flights_path,
+    path=file_prefix+flights_path,
     header=True,
     sep=',',
     inferSchema=True,
@@ -50,7 +48,7 @@ flights_df.printSchema()
 
 # save in Hive
 flights_df.orderBy(['Month','DayofMonth']).coalesce(4)\
-    .write.format('orc').mode("overwrite")\
+    .write.format('parquet').mode("overwrite")\
     .saveAsTable(database+'.flights_raw')
 
 print("Flights table saved")  
@@ -60,7 +58,7 @@ print("Flights table saved")
 print("save airport data")
 
 airports_df = spark.read.csv(
-    path=s3_prefix+airport_path,
+    path=file_prefix+airport_path,
     header=True,
     sep=',',
     inferSchema=True,
@@ -70,7 +68,7 @@ airports_df.printSchema()
 
 # save in Hive
 airports_df.orderBy(['state','airport']).coalesce(2)\
-    .write.format('orc').mode("overwrite")\
+    .write.format('parquet').mode("overwrite")\
     .saveAsTable(database+'.airports')
     
 print("airports table saved")  
@@ -81,7 +79,7 @@ print("airports table saved")
 print("save carriers data")
 
 carriers_df = spark.read.csv(
-    path=s3_prefix+carrier_path,
+    path=file_prefix+carrier_path,
     header=True,
     sep=',',
     inferSchema=True,
@@ -91,7 +89,7 @@ carriers_df.printSchema()
 
 # save in Hive
 carriers_df.orderBy(['Code']).coalesce(2)\
-    .write.format('orc').mode("overwrite")\
+    .write.format('parquet').mode("overwrite")\
     .saveAsTable(database+'.carriers')
     
 print("carriers table saved")  

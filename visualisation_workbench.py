@@ -21,17 +21,19 @@
 # file paths 
 flights_path='airlines/flights/'
 carriers_path='airlines/carriers/carriers.csv'
-
+file_prefix='file:////home/cdsw/'
 
 # ### Start Spark session
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 
-spark = SparkSession.builder \
-  .master('yarn') \
-  .config("spark.executor.instances","3")\
+spark = SparkSession\
+  .builder\
+  .appName('CML Visualisation')\
   .config("spark.executor.memory","2g")\
-  .appName('visualisation_workbench') \
+  .config("spark.executor.cores","2")\
+  .config("spark.executor.instances","3")\
+  .config("spark.yarn.access.hadoopFileSystems","s3a://prod-cdptrialuser19-trycdp-com/cdp-lake/")\
   .getOrCreate()
 
 
@@ -47,7 +49,7 @@ spark = SparkSession.builder \
 # ### From file 
 
 flight_raw_df = spark.read.csv(
-    path=flights_path,
+    path=file_prefix+flights_path,
     header=True,
     sep=',',
     inferSchema=True,
